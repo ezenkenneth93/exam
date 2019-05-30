@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    
+ <!-- 이 파일의 경로를 config.xml에 명시해야 한다. -->
+ 
+ <!--  이 파일의 구조대로 구현될 클래스의 이름 -->
+ <mapper namespace="DepartmentMapper">
+ 
+ 	<!-- Beans클래스의 객체이름(id)과 클래스이름(type)을 명시한다-->
+ 	<resultMap id="department" type="study.jsp.student.model.Department">
+ 		<!-- Beans의 멤버변수(property)이름과 대상 테이블의 컬럼을 연결한다. -->
+ 		<result property="deptno"	column="deptno"/>
+ 		<result property="dname"	column="dname"/>
+ 		<result property="loc"	column="loc"/>
+ 		<result property="limitStart" column="limit_start"/>
+ 		<result property="listCount" column="list_count"/>
+ 	</resultMap>
+ 	
+ 	
+ 	<!-- 학과 목록 조회하기 -->
+ 	<select id="selectDepartmentList" parameterType="study.jsp.student.model.Department"
+ 			resultMap="department">
+ 		Select deptno, dname, loc from department		
+ 	</select>
+ 	
+ 	
+ 	<!-- 단일행 조회하기 -->
+ 	<select id="selectDepartmentItem" parameterType="study.jsp.student.model.Department"
+		resultMap="department">
+		<!-- "#{변수명}" 으로 표시된 곳에 파라미터로 전달된 Beans의 멤버변수값이 치환된다. -->
+		Select deptno, dname, loc from department WHERE deptno=#{deptno}
+	</select>
+	
+	
+	<!-- 학과 저장 -->
+	<insert id="insertDepartmentItem" parameterType="study.jsp.student.model.Department"
+		useGeneratedKeys="true" keyProperty="deptno">
+		<!-- "#{변수명}" 으로 표시된 곳에 파라미터로 전달된 Beans의 멤버변수값이 치환된다. -->
+		INSERT INTO department (
+			dname, loc
+		 ) VALUES (
+			#{dname}, #{loc}
+		)
+	</insert>
+	
+	<!-- 학과 삭제 -->
+	<delete id="deleteDepartmentItem" parameterType="study.jsp.student.model.Department">
+		<!-- "#{변수명}" 으로 표시된 곳에 파라미터로 전달된 Beans의 멤버변수값이 치환된다. -->
+		Delete from department where deptno=#{deptno}
+	</delete>
+	
+	
+	<!-- 학과 갱신 -->
+	<update id="updateDepartmentItem" parameterType="study.jsp.student.model.Department">
+		<!-- "#{변수명}" 으로 표시된 곳에 파라미터로 전달된 Beans의 멤버변수값이 치환된다. -->
+		UPDATE department SET 
+			dname=#{dname}, loc=#{loc}
+		WHERE deptno=#{deptno}
+	</update>
+	
+	<select id="selectDepartmentJoinList" parameterType="study.jsp.student.model.Department"
+	 resultMap="department">
+		<!-- 이 안에서 처리할 SQL문을 명시한다. -->
+		Select deptno, dname, loc from department	
+		<where>
+			<if test="dname != null and dname != ''">
+				dname LIKE concat('%', #{dname}, '%')
+			</if>
+		</where>
+		ORDER BY deptno ASC
+		LIMIT #{limitStart}, #{listCount} 
+	</select>
+	
+	<select id="selectDepartmentCount"
+			parameterType="study.jsp.student.model.Department"
+			resultType="int">
+		SELECT count(deptno) FROM department
+		<where>
+			<if test="dname != null and dname != ''">
+				dname LIKE concat('%',#{dname},'%')
+			</if>
+		</where>	
+	</select>
+	
+	
+ </mapper>
